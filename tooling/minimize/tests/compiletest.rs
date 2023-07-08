@@ -21,4 +21,5 @@ fn cfg(path: &str) -> ui_test::Config {
 fn main() {
     ui_test::run_tests(cfg("./tests/pass")).unwrap();
     ui_test::run_tests(cfg("./tests/ub")).unwrap();
+    ui_test::run_tests(cfg("./tests/datarace")).unwrap();
 }

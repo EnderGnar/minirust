@@ -77,6 +77,7 @@ fn main() {
                 TerminationInfo::MachineStop => { /* silent exit. */ }
                 TerminationInfo::Ub(err) => eprintln!("UB: {}", err.get_internal()),
                 TerminationInfo::Deadlock => eprintln!("ERR: deadlock"),
+                _ => unreachable!(),
             }
         }
     });
