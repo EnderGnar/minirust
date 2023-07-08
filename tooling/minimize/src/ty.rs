@@ -82,6 +82,9 @@ pub fn translate_ty<'tcx>(ty: rs::Ty<'tcx>, tcx: rs::TyCtxt<'tcx>) -> Type {
         rs::TyKind::FnPtr(_) => {
             Type::Ptr(PtrType::FnPtr)
         }
+        rs::TyKind::Never => {
+            Type::Tuple { fields: list!(), size: Size::ZERO }
+        }
         x => {
             dbg!(x);
             todo!()
