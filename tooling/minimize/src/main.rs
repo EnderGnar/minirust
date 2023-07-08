@@ -76,7 +76,7 @@ fn main() {
                 TerminationInfo::IllFormed => eprintln!("ERR: program not well-formed."),
                 TerminationInfo::MachineStop => { /* silent exit. */ }
                 TerminationInfo::Ub(err) => eprintln!("UB: {}", err.get_internal()),
-                _ => unreachable!(),
+                TerminationInfo::Deadlock => eprintln!("ERR: deadlock"),
             }
         }
     });
