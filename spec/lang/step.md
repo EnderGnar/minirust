@@ -98,6 +98,12 @@ impl<M: Memory> Machine<M> {
                     provenance: None,
                 })
             },
+            Constant::Null => {
+                Value::Ptr(Pointer {
+                    addr: Address::ZERO,
+                    provenance: None,
+                })
+            }
             Constant::Variant { idx, data } => {
                 let data = self.eval_constant(data)?;
                 Value::Variant { idx, data }

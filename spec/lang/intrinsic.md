@@ -212,7 +212,7 @@ impl<M: Memory> Machine<M> {
         // We enforce this by only allowing functions that return () and !.
         if let Some(name) = func.ret {
             if func.locals[name].ty.size::<M::T>() != Size::ZERO {
-                throw_ub!("invalid first argument to `Intrinsic::Spawn`, function returns something");
+                throw_ub!("invalid first argument to `Intrinsic::Spawn`, function returns something non zero sized");
             }
         }
 
