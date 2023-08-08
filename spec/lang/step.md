@@ -578,7 +578,8 @@ impl<M: Memory> Machine<M> {
             locals.insert(callee_local, p);
             // Copy the value at caller (source) type. We know the types have the same layout so this will fit.
             // `p` is a fresh pointer so there should be no reason the store can fail.
-            self.mem.typed_store(p, caller_val, caller_pty, Atomicity::None).unwrap();
+            // `Atomicity::Init` is okay since no other thread can have this allocation.
+            self.mem.typed_store(p, caller_val, caller_pty, Atomicity::Init).unwrap();
         }
 
         // Push new stack frame, so it is executed next.

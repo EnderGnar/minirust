@@ -127,7 +127,9 @@ impl<M: Memory> Machine<M> {
                 let encoded_ptr = encode_ptr::<M>(ptr);
                 bytes.write_subslice_at_index(i.bytes(), encoded_ptr);
             }
-            mem.store(global_ptrs[global_name], bytes, global.align, Atomicity::None)?;
+
+            // `Atomicity::Init` is okay since no other thread exists at this point.
+            mem.store(global_ptrs[global_name], bytes, global.align, Atomicity::Init)?;
         }
 
         // Allocate functions.
@@ -261,7 +263,8 @@ impl<M: Memory> Machine<M> {
         locals.insert(callee_local, p);
         // Copy the value at callee type. We know the types are both pointer so this will fit.
         // `p` is a fresh pointer so there should be no reason the store can fail.
-        self.mem.typed_store(p, data_pointer, callee_pty, Atomicity::None).unwrap();
+        // `Atomicity::Init` is okay since no other thread can have this allocation.
+        self.mem.typed_store(p, data_pointer, callee_pty, Atomicity::Init).unwrap();
 
         // Create place for return local, if needed.
         if let Some(ret_local) = func.ret {

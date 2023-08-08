@@ -34,7 +34,8 @@ fn access_block(access: AccessPattern, support_global: u32, next: u32) -> BasicB
                 assign(global::<u32>(0), load(global::<u32>(support_global))),
                 goto(next),
             )
-        }
+        },
+        _ => unreachable!(),
     }
 }
 

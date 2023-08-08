@@ -18,6 +18,10 @@ pub enum Atomicity {
 
     /// A non-atomic memory access.
     None,
+
+    /// An access that can not be seen by any other thread except
+    /// for the one executing it. Requires comment explaining reason if used.
+    Init,
 }
 
 /// Internal type used to track the type of a memory access.
@@ -135,6 +139,9 @@ impl Access {
     /// Indicates if a races happend between the two given accesses.
     /// We assume they happen on different threads.
     fn races(self, other: Self) -> bool {
+        // If either has `Atomicity::Init` they can be ignored.
+        if self.atomicity == Atomicity::Init || other.atomicity == Atomicity::Init { return false; }
+
         // At least one access modifies the data.
         if self.ty == AccessType::Load && other.ty == AccessType::Load { return false; }
 
