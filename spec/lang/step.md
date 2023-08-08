@@ -616,7 +616,7 @@ impl<M: Memory> Machine<M> {
             // Therefore the thread must terminate now.
             assert_eq!(Int::ZERO, self.active_thread().stack.len());
 
-            return self.terminate_active_thread();
+            return self.terminate_active_thread(frame);
         };
         // If there is caller_return_info, there must be a caller.
         assert!(self.active_thread().stack.len() > 0);

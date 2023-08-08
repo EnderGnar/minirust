@@ -291,7 +291,7 @@ impl<M: Memory> Machine<M> {
         ret(())
     }
 
-    pub fn terminate_active_thread(&mut self) -> NdResult {
+    fn terminate_active_thread(&mut self, frame: StackFrame<M>) -> NdResult {
         let active = self.active_thread;
         assert!(active != 0, "the main thread cannot terminate");
 
@@ -306,6 +306,13 @@ impl<M: Memory> Machine<M> {
             }
             thread
         }).collect();
+
+        // Deallocate everything. Same as in return.
+        for (local, place) in frame.locals {
+            // A lot like `StorageDead`.
+            let layout = frame.func.locals[local].layout::<M::T>();
+            self.mem.deallocate(place, layout.size, layout.align)?;
+        }
 
         ret(())
     }
