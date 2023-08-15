@@ -59,7 +59,15 @@ impl<M: Memory> Machine<M> {
             self.eval_statement(stmt)?;
         }
 
-        self.mem.check_data_races(self.active_thread, prev_thread, prev_accesses)?;
+        // If the thread participated in the current timeframe we move to the next timeframe,
+        // otherwise we do a datarace check.
+        if !self.timeframe.contains(self.active_thread) {
+            self.mem.check_data_races(self.active_thread, prev_thread, prev_accesses)?;
+        }
+        else {
+            self.timeframe = Set::new();
+        }
+        self.timeframe.insert(self.active_thread);
 
         ret(())
     }

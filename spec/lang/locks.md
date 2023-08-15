@@ -88,6 +88,9 @@ impl<M: Memory> Machine<M> {
                     self.locks.mutate_at(lock_id, |lock| {
                         *lock = LockState::LockedBy(acquirer_id);
                     });
+
+                    // The thread gets activated which is why it also participates in the current timeframe.
+                    self.timeframe.insert(acquirer_id);
                 }
 
                 else {

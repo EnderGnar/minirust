@@ -25,6 +25,9 @@ pub struct Machine<M: Memory> {
     /// The currently / most recently active thread.
     active_thread: ThreadId,
 
+    /// All threads that could have been active at the same time.
+    timeframe: Set<ThreadId>,
+
     /// The Locks
     locks: List<LockState>,
 
@@ -150,6 +153,7 @@ impl<M: Memory> Machine<M> {
             fn_addrs,
             threads: list![Thread::main(start_fn)],
             locks: List::new(),
+            timeframe: Set::new(),
             active_thread: ThreadId::ZERO,
             stdout,
             stderr,
@@ -270,6 +274,9 @@ impl<M: Memory> Machine<M> {
         }
 
         self.threads.push(Thread::new(func, locals));
+
+        // The thread gets created which is why at this timeframe it is participating as well.
+        self.timeframe.insert(thread_id);
 
         ret(thread_id)
     }
