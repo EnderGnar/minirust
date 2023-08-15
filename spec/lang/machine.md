@@ -144,6 +144,8 @@ impl<M: Memory> Machine<M> {
 
         let start_fn = prog.functions[prog.start];
 
+        let mut timeframe = Set::new();
+        timeframe.insert(ThreadId::ZERO);
 
         ret(Machine {
             prog,
@@ -153,7 +155,7 @@ impl<M: Memory> Machine<M> {
             fn_addrs,
             threads: list![Thread::main(start_fn)],
             locks: List::new(),
-            timeframe: Set::new(),
+            timeframe,
             active_thread: ThreadId::ZERO,
             stdout,
             stderr,

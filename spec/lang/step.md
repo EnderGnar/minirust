@@ -38,12 +38,21 @@ impl<M: Memory> Machine<M> {
             thread.state == ThreadState::Enabled
         })?;
 
-        // Update current thread; remember previous thread for data race detection.
-        let prev_thread = self.active_thread;
+        // Update current thread.
         self.active_thread = thread_id;
 
         // Prepare data race detection for next step.
-        let prev_accesses = self.mem.reset_accesses();
+        let mut prev_accesses = self.mem.reset_accesses();
+
+        // If the thread participated in the current timeframe we move to the next timeframe
+        // and discard all accesses by the previous thread.
+        if self.timeframe.contains(self.active_thread) {
+            // If we move to the next step all accesses happened-before in this trace.
+            prev_accesses = list![];
+
+            self.timeframe = Set::new();
+        }
+        self.timeframe.insert(self.active_thread);
 
         let frame = self.cur_frame();
         let block = &frame.func.blocks[frame.next_block];
@@ -59,15 +68,8 @@ impl<M: Memory> Machine<M> {
             self.eval_statement(stmt)?;
         }
 
-        // If the thread participated in the current timeframe we move to the next timeframe,
-        // otherwise we do a datarace check.
-        if !self.timeframe.contains(self.active_thread) {
-            self.mem.check_data_races(self.active_thread, prev_thread, prev_accesses)?;
-        }
-        else {
-            self.timeframe = Set::new();
-        }
-        self.timeframe.insert(self.active_thread);
+        
+        self.mem.check_data_races(prev_accesses)?;
 
         ret(())
     }
